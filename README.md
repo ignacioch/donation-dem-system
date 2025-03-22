@@ -85,6 +85,17 @@ If reporting frequency increases substantially, potential optimizations include:
 3. Place `exchange_rates.csv` and `donations.csv` in the same directory as the script. Make sure they use the format mentioned below.
 4. Run the main script: `python main.py`
 
+### Run tests
+
+We have installed `pytest` for the tests (added in `test` subfolder).
+
+```
+python3 -m venv venv
+source venv/bin/activate
+(venv) > pip install pytest
+(venv) > pytest
+```
+
 ## CSV File Formats
 
 #### Exchange Rates CSV
