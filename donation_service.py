@@ -47,8 +47,6 @@ class DonationService:
         if self.most_generous_donator is None or self.most_generous_donator.total_eur < self.donators[donation.donator].total_eur:
             self.most_generous_donator = self.donators[donation.donator]
 
-
-        print("===============================================")
     
     def get_highest_charity_over_24_hours(self, end:datetime = None) -> Tuple[Charity, float, List[Donation]]:
         """Get the highest grossing charity over the last 24 hours. Can pass in a custom date."""
@@ -58,25 +56,25 @@ class DonationService:
         total_donations_per_charity = {}
         donations_per_charity = {}
         for donation in self.donations:
-            print(f"Checking donation: {donation.timestamp} vs {window_start} and {end}")
+            #print(f"Checking donation: {donation.timestamp} vs {window_start} and {end}")
             if donation.timestamp >= window_start and donation.timestamp <= end:
                 total_donations_per_charity[donation.charity] = total_donations_per_charity.get(donation.charity, 0) + donation.amount_eur
                 donations_per_charity[donation.charity] = donations_per_charity.get(donation.charity, []) + [donation]
-                print(f"Donations for {donation.charity}: {total_donations_per_charity[donation.charity]}")
+                #print(f"Donations for {donation.charity}: {total_donations_per_charity[donation.charity]}")
 
         # get the highest grossing charity
         if total_donations_per_charity == {}:
             return (None, 0, [])
         
         highest_charity = max(total_donations_per_charity, key=total_donations_per_charity.get)
-        print(f"Highest charity: {highest_charity} with {total_donations_per_charity[highest_charity]}")
+        #print(f"Highest charity: {highest_charity} with {total_donations_per_charity[highest_charity]}")
         # Sort the donations for the highest charity by timestamp
         donations_per_charity[highest_charity].sort(key=lambda d: d.timestamp)
-        print(f"Donations for {highest_charity}: {donations_per_charity[highest_charity]}")
+        #print(f"Donations for {highest_charity}: {donations_per_charity[highest_charity]}")
 
         # Get the latest 5 donations
         latest_5_donations = donations_per_charity[highest_charity][-5:]
-        print(f"Latest 5 donations: {latest_5_donations}")
+        #print(f"Latest 5 donations: {latest_5_donations}")
         return (highest_charity, total_donations_per_charity[highest_charity], latest_5_donations)
     
 
