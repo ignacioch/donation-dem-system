@@ -53,10 +53,6 @@ class Donation:
                 raise ValueError(f"Invalid amount format: {amount}")
         # will be updated from add_donation if we are not in EUR
         self.amount_eur : float|None = None if self.currency != 'EUR' else self.amount 
-        
-    
-    def __str__(self):
-        return f"{self.donator} donated {self.amount}{self.currency} to charity {self.charity} at {self.timestamp}"
     
     def __repr__(self):
         if self.amount_eur is not None:

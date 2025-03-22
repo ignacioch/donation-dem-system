@@ -1,6 +1,7 @@
 from models import Donation, Charity, Donator
 from exchange_rate_service import ExchangeRateService
 from datetime import datetime, timedelta
+from typing import List, Tuple  
 
 class DonationService:
     """A class representing a donation service."""
@@ -16,38 +17,20 @@ class DonationService:
         self.most_generous_donator : Donator = None 
         # Total donations throught the service's lifetime
         self.total_donations = 0
-
-    def _validate_sliding_window(self, donation_timestamp:datetime):
-        window_start = donation_timestamp - timedelta(days=1)
-        # remove older ones
-        while len(self.sliding_window_queue) > 0 and self.sliding_window_queue[0].timestamp < window_start:
-            oldest = self.sliding_window_queue.pop(0)
-            self.sliding_window_total_per_charity[oldest.charity] -= oldest.amount_eur
-            if self.sliding_window_total_per_charity[oldest.charity] == 0:
-                del self.sliding_window_total_per_charity[oldest.charity]
-        # update highest grossing charity
-        if len(self.sliding_window_queue) > 0:
-            self.highest_grossing_charity = max(self.sliding_window_total_per_charity, key=self.sliding_window_total_per_charity.get)
-        else:
-            self.highest_grossing_charity = None
-
     
     def add_donation(self, donation:Donation):
-        print("===============================================")
-        print(f"(Trying) Adding donation: {donation}")
         if donation.amount_eur is None:
             # the original donation isn't in EUR so we need to convert it
             eur = self.exchange_rate_service.convert_to_eur(donation.amount, donation.currency, donation.timestamp)
             if eur is None:
                 raise ValueError(f"No exchange rate available for {donation.currency} to EUR at {donation.timestamp})")
             donation.amount_eur = eur
-            print(f"Converted {donation.amount} {donation.currency} to {donation.amount_eur} EUR")
         self.donations.append(donation)
-        
+        print(f"Added donation: {donation}")
+
         # Update running total
         # O(1) to keep total donations updates
         self.total_donations += donation.amount_eur
-        print(f"Total donations({len(self.donations)}): {self.total_donations}")
 
         # update charities
         # O(1) to keep total donations per charity updated
@@ -67,7 +50,7 @@ class DonationService:
 
         print("===============================================")
     
-    def get_highest_charity_over_24_hours(self, end:datetime = None) -> Charity:
+    def get_highest_charity_over_24_hours(self, end:datetime = None) -> Tuple[Charity, float, List[Donation]]:
         """Get the highest grossing charity over the last 24 hours. Can pass in a custom date."""
         window_start: datetime = end - timedelta(days=1) if end is not None else datetime.now() - timedelta(days=1)
         print(f"Getting highest charity over the last 24 hours starting from {window_start}")
@@ -75,18 +58,26 @@ class DonationService:
         total_donations_per_charity = {}
         donations_per_charity = {}
         for donation in self.donations:
+            print(f"Checking donation: {donation.timestamp} vs {window_start} and {end}")
             if donation.timestamp >= window_start and donation.timestamp <= end:
                 total_donations_per_charity[donation.charity] = total_donations_per_charity.get(donation.charity, 0) + donation.amount_eur
                 donations_per_charity[donation.charity] = donations_per_charity.get(donation.charity, []) + [donation]
+                print(f"Donations for {donation.charity}: {total_donations_per_charity[donation.charity]}")
 
         # get the highest grossing charity
+        if total_donations_per_charity == {}:
+            return (None, 0, [])
+        
         highest_charity = max(total_donations_per_charity, key=total_donations_per_charity.get)
+        print(f"Highest charity: {highest_charity} with {total_donations_per_charity[highest_charity]}")
         # Sort the donations for the highest charity by timestamp
         donations_per_charity[highest_charity].sort(key=lambda d: d.timestamp)
+        print(f"Donations for {highest_charity}: {donations_per_charity[highest_charity]}")
 
         # Get the latest 5 donations
         latest_5_donations = donations_per_charity[highest_charity][-5:]
-        return (highest_charity, self.charities[highest_charity], latest_5_donations)
+        print(f"Latest 5 donations: {latest_5_donations}")
+        return (highest_charity, total_donations_per_charity[highest_charity], latest_5_donations)
     
 
 
