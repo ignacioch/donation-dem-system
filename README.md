@@ -114,20 +114,14 @@ User1,$10,Cancer Research,21 Jan 2023 10:15 EST
 ...
 ```
 
-
-
 ## Future Improvements
 
 1. **Precision Improvements**: Replace `float` with `Decimal` to avoid floating-point precision issues with monetary values.
 
 2. **Structured Logging**: Replace print statements with proper logging infrastructure.
 
-3. **Database Integration**: Add persistence layer with appropriate indexing.
+3. **Read Performance**: Implement caching strategies for high-volume reporting scenarios.
 
-4. **Error Handling**: Implement more robust error handling and input validation.
+4. **Currency Support**: Expand support for additional currencies and more sophisticated conversion paths (BFS/DFS).
 
-5. **Test Coverage**: Add comprehensive unit and integration tests.
-
-6. **Read Performance**: Implement caching strategies for high-volume reporting scenarios.
-
-7. **Currency Support**: Expand support for additional currencies and more sophisticated conversion paths (BFS/DFS).
+5. **Database Integration**: On a production system, add persistence layer with appropriate indexing.
