@@ -53,8 +53,6 @@ class ExchangeRateService:
         """
         Get exchange rate for a specific date, source and target currency.
         If a rate isn't available for the specific date, the closest one is returned.
-        If a dirct rate isn't available, the service will try to convert the source currency to the target currency
-        using intermediate currencies.
         """
         date_str = date.strftime("%Y-%m-%d")
         source_target = f"{source}_{target}"
@@ -87,6 +85,7 @@ class ExchangeRateService:
                 # We'll use the same fee for simplicity
                 return ExchangeRate(source, target, inverted_rate, inverse_rate.fee, inverse_rate.date)
             #print(f"[Case 2.3] : No direct rate for {source_target} or {target_source} on {date_str}")
+        
         # Case 3
         # what if I have no data for the specific date?
         # I could return the latest rate available
