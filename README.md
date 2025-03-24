@@ -1,6 +1,6 @@
 # Charity Crowdfunding Transaction System
 
-This is a prototype backend system for ACME's charity crowdfunding platform. It processes donation transactions, handles currency conversion, and provides reporting APIs.
+This is a first working prototype of a Crowdfunding Transaction System. Specific assumptions have been made around access patterns and acceptable latency goals for each of the API calls.
 
 ## Features
 
@@ -47,15 +47,15 @@ If reporting frequency increases substantially, potential optimizations include:
 
 1. **Time-Window Caching**: Implement a caching mechanism for 24-hour window calculations that invalidates only when new donations fall within the cached window.
 
-2. **Indexed Data Structures**: Maintain time-indexed data structures to reduce the cost of time-range queries.
+2. **Indexed/Ordered Data Structures**: Maintain time-indexed or ordered data structures to reduce the cost of time-range queries.
 
 3. **Sliding Window Tracking**: Track donations in a sliding window data structure that efficiently handles newest/oldest donation transitions.
 
-4. **Materialized Views**: For database implementations, use materialized views that periodically refresh aggregation data.
+4. **Materialized Views**: For database implementations, we can use materialized views that periodically refresh aggregation data. Even a simpler regular view can help us in speeding up frequent queries.
 
 ## Assumptions
 
-1. **Currencies**: The system handles USD, GBP, and EUR currencies with symbols ($, £, €).
+1. **Currencies**: The system ONLY handles USD, GBP, and EUR currencies with symbols ($, £, €).
 
 2. **Exchange Rates**: 
    - When a direct exchange rate is not available for a specific date, the system uses the closest available date.
@@ -67,7 +67,7 @@ If reporting frequency increases substantially, potential optimizations include:
 
 5. **Timezones** :
 
-- Input timestamps may include EST, CET, or GMT timezone information
+- Input timestamps may include ONLY EST, CET, or GMT timezone information
 - All timestamps are converted to UTC for storage and processing
 - Timezone conversion uses fixed offsets (EST: UTC-5, CET: UTC+1, GMT: UTC)
 - No daylight saving time adjustments are made for simplicity
